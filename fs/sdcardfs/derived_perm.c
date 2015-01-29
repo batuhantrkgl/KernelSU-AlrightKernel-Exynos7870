@@ -78,7 +78,7 @@ void get_derived_permission_new(struct dentry *parent, struct dentry *dentry,
 	inherit_derived_state(parent->d_inode, dentry->d_inode);
 
 	/* Files don't get special labels */
-	if (!S_ISDIR(dentry->d_inode->i_mode)) {
+	if (!d_is_dir(dentry)) {
 		set_top(info, parent_info);
 		return;
 	}
@@ -215,7 +215,7 @@ void fixup_lower_ownership(struct dentry *dentry, const char *name)
 	case PERM_ANDROID:
 	case PERM_ANDROID_DATA:
 	case PERM_ANDROID_MEDIA:
-		if (S_ISDIR(dentry->d_inode->i_mode))
+		if (d_is_dir(dentry))
 			gid = multiuser_get_uid(info_d->userid, AID_MEDIA_RW);
 		else
 			gid = multiuser_get_uid(info_d->userid, get_type(name));

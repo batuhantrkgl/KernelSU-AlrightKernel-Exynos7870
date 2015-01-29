@@ -67,7 +67,7 @@ enum ovl_path_type ovl_path_type(struct dentry *dentry)
 
 	if (oe->__upperdentry) {
 		if (oe->lowerdentry) {
-			if (S_ISDIR(dentry->d_inode->i_mode))
+			if (d_is_dir(dentry))
 				return OVL_PATH_MERGE;
 			else
 				return OVL_PATH_UPPER;
@@ -339,8 +339,8 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 	}
 
 	if (lowerdentry && upperdentry &&
-	    (!S_ISDIR(upperdentry->d_inode->i_mode) ||
-	     !S_ISDIR(lowerdentry->d_inode->i_mode))) {
+	    (!d_is_dir(upperdentry) ||
+	     !d_is_dir(lowerdentry))) {
 		dput(lowerdentry);
 		lowerdentry = NULL;
 		oe->opaque = true;
@@ -701,9 +701,9 @@ static int ovl_fill_super(struct super_block *sb, void *data, int silent)
 		goto out_put_lowerpath;
 
 	err = -EINVAL;
-	if (!S_ISDIR(upperpath.dentry->d_inode->i_mode) ||
-	    !S_ISDIR(lowerpath.dentry->d_inode->i_mode) ||
-	    !S_ISDIR(workpath.dentry->d_inode->i_mode)) {
+	if (!d_is_dir(upperpath.dentry) ||
+	    !d_is_dir(lowerpath.dentry) ||
+	    !d_is_dir(workpath.dentry)) {
 		pr_err("overlayfs: upperdir or lowerdir or workdir not a directory\n");
 		goto out_put_workpath;
 	}

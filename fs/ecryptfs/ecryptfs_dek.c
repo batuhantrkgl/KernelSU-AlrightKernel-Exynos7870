@@ -613,7 +613,7 @@ long ecryptfs_do_sdp_ioctl(struct file *file, unsigned int cmd, unsigned long ar
             return 0;
         }
 
-        if (S_ISDIR(ecryptfs_dentry->d_inode->i_mode)) {
+        if (d_is_dir(ecryptfs_dentry)) {
             DEK_LOGE("Set protected directory\n");
             crypt_stat->flags &= ~ECRYPTFS_DEK_IS_SENSITIVE;
             break;
@@ -657,7 +657,7 @@ long ecryptfs_do_sdp_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 	    dek_arg_add_chamber req;
 	    int engineid;
 
-        if (!S_ISDIR(ecryptfs_dentry->d_inode->i_mode)) {
+        if (!d_is_dir(ecryptfs_dentry)) {
             DEK_LOGE("Not a directory\n");
             return -ENOTDIR;
         }
@@ -705,7 +705,7 @@ long ecryptfs_do_sdp_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 	}
 
 	case ECRYPTFS_IOCTL_REMOVE_CHAMBER: {
-        if (!S_ISDIR(ecryptfs_dentry->d_inode->i_mode)) {
+        if (!d_is_dir(ecryptfs_dentry)) {
             DEK_LOGE("Not a directory\n");
             return -ENOTDIR;
         }

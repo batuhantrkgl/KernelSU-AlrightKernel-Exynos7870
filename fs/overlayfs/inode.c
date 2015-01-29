@@ -243,7 +243,7 @@ out:
 static bool ovl_need_xattr_filter(struct dentry *dentry,
 				  enum ovl_path_type type)
 {
-	return type == OVL_PATH_UPPER && S_ISDIR(dentry->d_inode->i_mode);
+	return type == OVL_PATH_UPPER && d_is_dir(dentry);
 }
 
 ssize_t ovl_getxattr(struct dentry *dentry, const char *name,
