@@ -29,6 +29,49 @@
 
 static struct kmem_cache *cred_jar;
 
+/* init to 2 - one for init_task, one to ensure it is never freed */
+struct group_info init_groups = { .usage = ATOMIC_INIT(2) };
+#ifdef CONFIG_RKP_KDP
+RKP_RO_AREA int rkp_cred_enable = 0;
+
+static struct kmem_cache *cred_jar_ro;
+struct kmem_cache *tsec_jar;
+struct kmem_cache *usecnt_jar;
+atomic_t init_cred_use_cnt = ATOMIC_INIT(4);
+
+unsigned  int rkp_get_usecount(struct cred *cred)
+{
+	if (rkp_ro_page((unsigned long )cred))
+			return (unsigned int)rocred_uc_read(cred);
+	else
+			return atomic_read(&cred->usage);
+}
+
+struct cred *get_new_cred(struct cred *cred)
+{
+	if (rkp_ro_page((unsigned long)cred))
+		rocred_uc_inc(cred);
+	else
+		atomic_inc(&cred->usage);
+	return cred;
+}
+
+void put_cred(const struct cred *_cred)
+{
+	struct cred *cred = (struct cred *) _cred;
+
+	validate_creds(cred);
+
+	if (rkp_ro_page((unsigned long)cred)) {
+		if (rocred_uc_dec_and_test(cred)) {
+			__put_cred(cred);
+		}
+	} else {
+		if (atomic_dec_and_test(&(cred)->usage))
+			__put_cred(cred);
+	}
+}
+#endif  /* CONFIG_RKP_KDP */
 /*
  * The initial credentials for the initial task
  */
