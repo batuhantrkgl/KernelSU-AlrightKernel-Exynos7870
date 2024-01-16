@@ -25,6 +25,7 @@ struct ovl_cache_entry {
 	struct rb_node node;
 	struct ovl_cache_entry *next_maybe_whiteout;
 	bool is_whiteout;
+	bool is_cursor;
 	char name[];
 };
 

@@ -33,7 +33,7 @@ static int load_script(struct linux_binprm *bprm)
 	 */
 	if (bprm->interp_flags & BINPRM_FLAGS_PATH_INACCESSIBLE)
 		return -ENOENT;
-_write_access(bprm->file);
+allow_write_access(bprm->file);
 	fput(bprm->file);
 	bprm->file = NULL;
 
